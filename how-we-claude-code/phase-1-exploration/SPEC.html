@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Diário do Casal — Spec / Phase 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F4EFE6;
+    --card: #FAF7F1;
+    --card-line: #E8E0D0;
+    --ink: #1F1A16;
+    --ink-soft: #3B342E;
+    --muted: #7A736C;
+    --rule: #E0D9CC;
+    --accent: #B84A2E;
+    --accent-soft: #F0DDD3;
+    --moss: #4A6A55;
+    --moss-soft: #DDE4D5;
+    --amber: #F5DDA7;
+    --amber-edge: #D9B97A;
+    --probe: #8B3A2F;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  main { max-width: 880px; padding: 96px 48px 160px; margin: 0 auto; }
+
+  /* Type */
+  h1 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 64px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 0 0 16px 0;
+  }
+  h2 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0 0 24px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+  }
+  h3 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px 0;
+  }
+  h4 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px 0;
+  }
+  p { margin: 0 0 18px 0; }
+  ul { margin: 0 0 18px 0; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+
+  .num {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  code, .mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.86em;
+  }
+  code {
+    background: var(--card);
+    padding: 1px 5px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 96px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 64px;
+  }
+  .hero .meta {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 28px;
+  }
+  .hero .meta::before {
+    content: "▸";
+    margin-right: 8px;
+  }
+  .hero .tagline {
+    font-size: 26px;
+    line-height: 1.4;
+    color: var(--ink-soft);
+    max-width: 680px;
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 32px;
+  }
+  .hero .byline {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+  }
+
+  /* Section */
+  section { margin-bottom: 96px; }
+  section > p, section > ul { max-width: 680px; }
+
+  /* Pull quote / aside */
+  .aside {
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 18px;
+    margin: 24px 0;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 17px;
+    max-width: 620px;
+  }
+
+  /* Two-col is/isnt */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 8px;
+  }
+  .col {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    padding: 28px;
+    border-radius: 4px;
+  }
+  .col.isnt h3 { color: var(--accent); }
+
+  /* Decisions table */
+  .decisions {
+    border-top: 1px solid var(--rule);
+  }
+  .decisions .row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .decisions .row dt {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin: 4px 0 0 0;
+  }
+  .decisions .row dd { margin: 0; color: var(--ink); }
+
+  /* Domain entities */
+  .entity-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 24px 0 32px 0;
+  }
+  .entity {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+  .entity .name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+    margin-bottom: 4px;
+    color: var(--ink);
+  }
+  .entity .desc {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .entity .fields {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    white-space: pre;
+  }
+
+  /* Invariants list */
+  .invariants {
+    background: var(--moss-soft);
+    border: 1px solid #C8D2BE;
+    border-radius: 4px;
+    padding: 22px 26px;
+    margin: 32px 0;
+  }
+  .invariants h3 { color: var(--moss); margin-bottom: 14px; }
+  .invariants ul { margin: 0; padding-left: 20px; }
+  .invariants li { color: var(--ink-soft); }
+  .invariants code {
+    background: rgba(255,255,255,0.55);
+    border-color: #C8D2BE;
+  }
+
+  /* Balance illustration */
+  .balance-flow {
+    margin: 32px 0;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 4px;
+    padding: 32px;
+  }
+  .balance-flow .caption {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .balance-flow svg { width: 100%; height: auto; display: block; }
+
+  /* UI sketch */
+  .ui-sketch {
+    margin: 24px 0 16px;
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 4px;
+    padding: 28px;
+  }
+  .ui-sketch svg { width: 100%; height: auto; display: block; }
+
+  /* API table */
+  table.api {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    margin: 16px 0 32px;
+  }
+  table.api th, table.api td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  table.api th {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    border-bottom: 1px solid var(--ink-soft);
+  }
+  table.api td.method {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 500;
+    color: var(--accent);
+    width: 80px;
+  }
+  table.api td.path {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    width: 240px;
+  }
+
+  /* Fixtures grid */
+  .units {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 20px 0 32px;
+  }
+  .unit {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 4px;
+    padding: 18px 22px;
+  }
+  .unit .unit-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .unit .unit-name {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .unit .unit-tagline {
+    font-style: italic;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .fixtures { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11.5px;
+    padding: 4px 9px;
+    border-radius: 3px;
+    background: white;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+  }
+  .chip.probe {
+    background: var(--accent-soft);
+    border-color: #E5BAA8;
+    color: var(--probe);
+    font-weight: 500;
+  }
+  .chip.probe::before { content: "⚠ "; opacity: 0.8; }
+
+  /* Edge cases */
+  .edges {
+    margin: 18px 0 0 0;
+  }
+  .edges details {
+    border-top: 1px solid var(--rule);
+    padding: 14px 0;
+  }
+  .edges details:last-child { border-bottom: 1px solid var(--rule); }
+  .edges summary {
+    cursor: pointer;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    list-style: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .edges summary::-webkit-details-marker { display: none; }
+  .edges summary::after {
+    content: "↓";
+    color: var(--muted);
+    font-size: 12px;
+    margin-left: 12px;
+  }
+  .edges details[open] summary::after { content: "↑"; }
+  .edges .answer {
+    margin-top: 10px;
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 640px;
+  }
+
+  /* Risks / scope */
+  .scope {
+    background: var(--amber);
+    border: 1px solid var(--amber-edge);
+    border-radius: 4px;
+    padding: 22px 26px;
+    margin-top: 24px;
+  }
+  .scope h3 { color: #856407; }
+  .scope ul { margin: 0; padding-left: 20px; }
+  .scope li { color: var(--ink-soft); }
+
+  .risk { margin-bottom: 20px; }
+  .risk .label {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* Responsive */
+  @media (max-width: 720px) {
+    main { padding: 60px 24px 100px; }
+    h1 { font-size: 44px; }
+    h2 { font-size: 24px; }
+    .hero .tagline { font-size: 20px; }
+    .two-col { grid-template-columns: 1fr; }
+    .entity-grid { grid-template-columns: 1fr; }
+    .decisions .row { grid-template-columns: 1fr; gap: 4px; }
+    .decisions .row dt { margin-bottom: 4px; }
+    table.api td.path { width: auto; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- HERO -->
+  <header class="hero">
+    <span class="meta">Phase 1 / Exploration · 2026-05-07 · Spec</span>
+    <h1>Diário do Casal</h1>
+    <p class="tagline">A no-account, link-based ledger that splits a couple's shared expenses proportionally to monthly income, and keeps a continuous running balance.</p>
+    <p class="byline">Working name. Spec produced from a Phase 1 interview, written for an implementation that lives inside Phase 3 of the workshop's verifiable React stack.</p>
+  </header>
+
+  <!-- 01 PRODUCT -->
+  <section>
+    <h2><span class="num">01</span> Product</h2>
+    <p>Two people living together register shared expenses as they happen. The app figures out how much each owes the other based on their incomes for that month, accumulates the running balance over time, and lets them settle by recording manual transfers (Pix, dinheiro — payment happens outside the app).</p>
+
+    <p class="aside">"Cada um paga, app reconcilia. Renda variável mês a mês, totalmente visível. Sem conta. Saldo contínuo. Só despesas conjuntas." — decisões da entrevista, em uma frase.</p>
+
+    <div class="two-col">
+      <div class="col is">
+        <h3>What it is</h3>
+        <ul>
+          <li>A continuous-balance ledger between two people.</li>
+          <li>Proportional split based on monthly income.</li>
+          <li>Recurrence-aware (rent, utilities) without a cron.</li>
+          <li>Verifiable at runtime — every component declares fixtures and invariants.</li>
+        </ul>
+      </div>
+      <div class="col isnt">
+        <h3>What it isn't</h3>
+        <ul>
+          <li>Not a budgeting tool — no categories, no envelopes, no goals.</li>
+          <li>Not an audit log — no per-entry edit history.</li>
+          <li>Not a payment processor — no Pix QR, no integration.</li>
+          <li>Not a personal finance tracker — only joint expenses.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 DECISIONS -->
+  <section>
+    <h2><span class="num">02</span> Decisões</h2>
+    <p>Tudo abaixo foi cravado durante a entrevista. Cada linha encerra uma ambiguidade.</p>
+    <dl class="decisions">
+      <div class="row"><dt>Audiência</dt><dd>Casais com finanças compartilhadas continuamente.</dd></div>
+      <div class="row"><dt>Core mechanic</dt><dd>Settle-up proporcional à renda do mês.</dd></div>
+      <div class="row"><dt>Money flow</dt><dd>Cada um paga com seu cartão. App reconcilia.</dd></div>
+      <div class="row"><dt>Renda</dt><dd>Variável mês a mês. Cada um digita a sua a qualquer hora. Atualização retroage no mesmo mês.</dd></div>
+      <div class="row"><dt>Privacidade</dt><dd>Renda totalmente visível para o parceiro.</dd></div>
+      <div class="row"><dt>Auth</dt><dd>Sem conta. Slug aleatório na URL é a única credencial.</dd></div>
+      <div class="row"><dt>Onboarding</dt><dd>Criador nomeia ambos os membros, copia o link, manda pro parceiro. Acesso simétrico.</dd></div>
+      <div class="row"><dt>Ciclo</dt><dd>Saldo contínuo. Sem fechamento de mês.</dd></div>
+      <div class="row"><dt>Escopo de despesa</dt><dd>Só conjuntas. Pessoal não entra.</dd></div>
+      <div class="row"><dt>Settle-up</dt><dd>Transferência manual ("paguei R$ 200 no Pix") como evento explícito.</dd></div>
+      <div class="row"><dt>Recorrência</dt><dd>Sim. Auto-materializada no dia configurado.</dd></div>
+      <div class="row"><dt>Renda ausente</dt><dd>Fallback no mês anterior do membro. Recalcula quando a do mês entra.</dd></div>
+    </dl>
+  </section>
+
+  <!-- 03 DOMAIN -->
+  <section>
+    <h2><span class="num">03</span> Domain Model</h2>
+    <p>Um ledger. Dois membros fixos. Eventos imutáveis em cima.</p>
+
+    <div class="entity-grid">
+
+      <div class="entity">
+        <div class="name">Ledger</div>
+        <div class="desc">Container do casal. Identificado pelo slug.</div>
+        <div class="fields">slug         string (16+ base62)
+createdAt    timestamp</div>
+      </div>
+
+      <div class="entity">
+        <div class="name">Member  ×2</div>
+        <div class="desc">Posição A e B fixas. Renomeáveis.</div>
+        <div class="fields">id           uuid
+name         string
+position     "A" | "B"</div>
+      </div>
+
+      <div class="entity">
+        <div class="name">IncomeEntry</div>
+        <div class="desc">Renda do membro num mês. Latest write wins.</div>
+        <div class="fields">memberId     uuid
+monthKey     "YYYY-MM"
+amountCents  int (&gt; 0)
+updatedAt    timestamp</div>
+      </div>
+
+      <div class="entity">
+        <div class="name">Expense</div>
+        <div class="desc">Despesa conjunta. Proporcional à renda do mês.</div>
+        <div class="fields">id              uuid (client)
+paidByMemberId  uuid
+amountCents     int (&gt; 0)
+description     string
+occurredAt      timestamp
+recurrenceRuleId uuid?
+deletedAt       timestamp?</div>
+      </div>
+
+      <div class="entity">
+        <div class="name">Transfer</div>
+        <div class="desc">Pix manual entre os dois. Move saldo direto.</div>
+        <div class="fields">id              uuid (client)
+fromMemberId    uuid
+toMemberId      uuid
+amountCents     int (&gt; 0)
+occurredAt      timestamp
+note            string?</div>
+      </div>
+
+      <div class="entity">
+        <div class="name">RecurrenceRule</div>
+        <div class="desc">Aluguel, internet — emite Expense por mês.</div>
+        <div class="fields">id              uuid
+paidByMemberId  uuid
+amountCents     int
+description     string
+dayOfMonth      1..31
+startsAt        monthKey
+endsAt          monthKey?
+pausedAt        timestamp?</div>
+      </div>
+
+    </div>
+
+    <!-- Balance flow illustration -->
+    <div class="balance-flow">
+      <div class="caption">Como o saldo se forma — exemplo concreto</div>
+      <svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#7A736C"/>
+          </marker>
+          <marker id="arrAcc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#B84A2E"/>
+          </marker>
+        </defs>
+
+        <!-- Members -->
+        <g font-family="Inter" font-size="13" fill="#1F1A16">
+          <g>
+            <circle cx="80" cy="60" r="28" fill="#FAF7F1" stroke="#E0D9CC"/>
+            <text x="80" y="64" text-anchor="middle" font-weight="600">D</text>
+            <text x="80" y="110" text-anchor="middle" fill="#7A736C" font-size="11">Diego · R$ 8.000</text>
+          </g>
+          <g>
+            <circle cx="80" cy="220" r="28" fill="#FAF7F1" stroke="#E0D9CC"/>
+            <text x="80" y="224" text-anchor="middle" font-weight="600">M</text>
+            <text x="80" y="270" text-anchor="middle" fill="#7A736C" font-size="11">Maria · R$ 5.000</text>
+          </g>
+          <text x="80" y="310" text-anchor="middle" fill="#B84A2E" font-size="11" font-weight="600" letter-spacing="0.08em">PROPORÇÃO  62 / 38</text>
+        </g>
+
+        <!-- Expense flow -->
+        <g font-family="Crimson Pro" font-size="13" fill="#3B342E">
+          <rect x="220" y="40" width="220" height="56" rx="4" fill="#FAF7F1" stroke="#E0D9CC"/>
+          <text x="232" y="62" font-family="Inter" font-weight="500" font-size="12" fill="#7A736C" letter-spacing="0.05em">EXPENSE · paga D</text>
+          <text x="232" y="82" font-style="italic">Mercado · R$ 800</text>
+
+          <rect x="220" y="200" width="220" height="56" rx="4" fill="#FAF7F1" stroke="#E0D9CC"/>
+          <text x="232" y="222" font-family="Inter" font-weight="500" font-size="12" fill="#7A736C" letter-spacing="0.05em">TRANSFER · M → D</text>
+          <text x="232" y="242" font-style="italic">Pix · R$ 200</text>
+        </g>
+
+        <!-- arrows from members to events -->
+        <line x1="115" y1="60" x2="218" y2="60" stroke="#7A736C" stroke-width="1" marker-end="url(#arr)"/>
+        <line x1="115" y1="225" x2="218" y2="225" stroke="#7A736C" stroke-width="1" marker-end="url(#arr)"/>
+
+        <!-- math step -->
+        <g font-family="JetBrains Mono" font-size="11.5" fill="#3B342E">
+          <text x="500" y="58">share(D) = 800 × 62%</text>
+          <text x="500" y="78">share(M) = 800 × 38%</text>
+          <text x="500" y="98" fill="#B84A2E">M deve a D = 304</text>
+
+          <text x="500" y="220">D recebeu de M = 200</text>
+          <text x="500" y="240" fill="#B84A2E">M deve a D = 304 − 200</text>
+          <text x="500" y="260" fill="#4A6A55" font-weight="500">balance(D) = +104</text>
+          <text x="500" y="278" fill="#4A6A55" font-weight="500">balance(M) = −104</text>
+        </g>
+
+        <!-- arrow into result -->
+        <line x1="445" y1="68" x2="495" y2="68" stroke="#B84A2E" stroke-width="1" marker-end="url(#arrAcc)"/>
+        <line x1="445" y1="228" x2="495" y2="228" stroke="#B84A2E" stroke-width="1" marker-end="url(#arrAcc)"/>
+
+        <!-- bottom invariant -->
+        <text x="400" y="335" font-family="Inter" font-size="12" font-style="italic" fill="#4A6A55" text-anchor="middle">balance(A) + balance(B) === 0  ·  invariante de zero-soma</text>
+      </svg>
+    </div>
+
+    <div class="invariants">
+      <h3>Invariantes</h3>
+      <ul>
+        <li><code>balance(A) + balance(B) === 0</code> sempre.</li>
+        <li><code>proportionFor(m).a + proportionFor(m).b === 100</code> em qualquer <code>monthKey</code>.</li>
+        <li>Atualizar income de um mês recomputa balances apenas das despesas daquele mês.</li>
+        <li>Renomear membro não muda balance.</li>
+        <li>Editar/deletar despesa ou transferência recomputa balance.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 04 UI -->
+  <section>
+    <h2><span class="num">04</span> UI Tour</h2>
+    <p>Tela principal: tudo do mês corrente em uma página. Onboarding em 3 passos só na criação. Configurações em menu lateral.</p>
+
+    <div class="ui-sketch">
+      <svg viewBox="0 0 800 540" xmlns="http://www.w3.org/2000/svg" font-family="Inter">
+        <!-- Frame -->
+        <rect x="20" y="20" width="760" height="500" rx="8" fill="#FAF7F1" stroke="#E0D9CC"/>
+
+        <!-- Top bar -->
+        <text x="44" y="56" font-size="11" fill="#7A736C" letter-spacing="0.1em">‹ ABRIL 2026 · MAIO 2026 ›</text>
+
+        <!-- Balance -->
+        <text x="44" y="100" font-family="Inter" font-size="22" font-weight="600" fill="#1F1A16">Maria deve R$ 104,00 a Diego</text>
+        <rect x="44" y="118" width="86" height="22" rx="11" fill="#F0DDD3" stroke="#E5BAA8"/>
+        <text x="87" y="133" font-size="11" font-weight="600" fill="#B84A2E" text-anchor="middle">62 / 38</text>
+        <text x="138" y="133" font-size="11" fill="#7A736C" font-style="italic">proporção do mês</text>
+
+        <!-- Income cards -->
+        <rect x="44" y="160" width="340" height="78" rx="4" fill="white" stroke="#E0D9CC"/>
+        <text x="60" y="184" font-size="11" fill="#7A736C" letter-spacing="0.08em">DIEGO · MAIO 2026</text>
+        <text x="60" y="216" font-size="22" font-weight="600" fill="#1F1A16">R$ 8.000,00</text>
+
+        <rect x="394" y="160" width="340" height="78" rx="4" fill="white" stroke="#E0D9CC"/>
+        <text x="410" y="184" font-size="11" fill="#7A736C" letter-spacing="0.08em">MARIA · MAIO 2026</text>
+        <text x="410" y="216" font-size="22" font-weight="600" fill="#1F1A16">R$ 5.000,00</text>
+
+        <!-- Timeline header -->
+        <text x="44" y="278" font-size="11" fill="#7A736C" letter-spacing="0.1em">TIMELINE DE MAIO</text>
+        <line x1="44" y1="288" x2="756" y2="288" stroke="#E0D9CC"/>
+
+        <!-- Entry rows -->
+        <g font-family="Crimson Pro" font-size="14" fill="#1F1A16">
+          <text x="44" y="310" font-style="italic">07 mai</text>
+          <text x="120" y="310">Mercado</text>
+          <text x="730" y="310" text-anchor="end" font-family="JetBrains Mono" font-size="13">R$ 800,00</text>
+          <text x="120" y="324" font-size="11" font-style="italic" fill="#7A736C">paga Diego · M deve 304 · D deve 496</text>
+        </g>
+
+        <line x1="44" y1="338" x2="756" y2="338" stroke="#E0D9CC" stroke-dasharray="2,3"/>
+
+        <g font-family="Crimson Pro" font-size="14" fill="#1F1A16">
+          <text x="44" y="360" font-style="italic">05 mai</text>
+          <text x="120" y="360">Aluguel</text>
+          <text x="44" y="360"></text>
+          <text x="730" y="360" text-anchor="end" font-family="JetBrains Mono" font-size="13">R$ 2.500,00</text>
+          <text x="120" y="374" font-size="11" font-style="italic" fill="#7A736C">paga Diego · ↻ recorrente</text>
+        </g>
+
+        <line x1="44" y1="388" x2="756" y2="388" stroke="#E0D9CC" stroke-dasharray="2,3"/>
+
+        <g font-family="Crimson Pro" font-size="14" fill="#1F1A16">
+          <text x="44" y="410" font-style="italic">03 mai</text>
+          <text x="120" y="410">Pix M → D</text>
+          <text x="730" y="410" text-anchor="end" font-family="JetBrains Mono" font-size="13" fill="#4A6A55">R$ 200,00</text>
+          <text x="120" y="424" font-size="11" font-style="italic" fill="#7A736C">transferência manual de settle</text>
+        </g>
+
+        <!-- Footer breakdown -->
+        <line x1="44" y1="450" x2="756" y2="450" stroke="#E0D9CC"/>
+        <text x="44" y="476" font-size="11" fill="#7A736C" letter-spacing="0.1em">BREAKDOWN</text>
+        <text x="44" y="498" font-size="13" font-style="italic" fill="#3B342E" font-family="Crimson Pro">Vocês gastaram R$ 320 a mais que abril.</text>
+
+        <!-- FAB -->
+        <circle cx="730" cy="490" r="22" fill="#B84A2E"/>
+        <text x="730" y="495" text-anchor="middle" font-size="22" font-weight="500" fill="white">+</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 05 PERSISTENCE -->
+  <section>
+    <h2><span class="num">05</span> Persistência &amp; Sync</h2>
+    <p>Backend é persistência burra. Toda lógica de domínio (balance, proporção, recorrência) roda no cliente. Slug é a única credencial.</p>
+
+    <table class="api">
+      <thead>
+        <tr><th>Método</th><th>Path</th><th>Função</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="method">POST</td><td class="path">/api/ledger</td><td>Cria ledger com 2 nomes. Retorna <code>{ slug }</code>.</td></tr>
+        <tr><td class="method">GET</td><td class="path">/api/ledger/:slug</td><td>Documento completo. 404 se não existir.</td></tr>
+        <tr><td class="method">PATCH</td><td class="path">/api/ledger/:slug</td><td>Aplica uma mutação. Body inclui <code>op</code>, <code>payload</code>, <code>baseEtag</code>.</td></tr>
+        <tr><td class="method">GET</td><td class="path">/api/ledger/:slug/stream</td><td>SSE de mutações (opcional). Polling 10s é o fallback.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:32px">Recurrence engine — client-side, lazy</h3>
+    <p>No load do app, o cliente computa quais <code>(rule, monthKey)</code> deveriam ter <code>Expense</code> e ainda não têm — emite os PATCHes faltantes. Idempotência via unique constraint <code>(rule_id, month_key) WHERE deleted_at IS NULL</code>. Sem cron infra. Materializa só passado e mês corrente.</p>
+
+    <h3 style="margin-top:24px">Pluggable client</h3>
+    <p>O frontend usa uma interface <code>LedgerClient</code> com <code>load / patch / subscribe</code>. Implementação default: HTTP + polling. Implementação de teste: in-memory síncrona, usada nos render targets <code>/verify/:unit/:fixture</code> para isolar componentes sem backend.</p>
+  </section>
+
+  <!-- 06 EDGE CASES -->
+  <section>
+    <h2><span class="num">06</span> Edge Cases</h2>
+    <p>Quando algo é ambíguo, esta é a resposta.</p>
+    <div class="edges">
+
+      <details>
+        <summary>Slug não existe</summary>
+        <div class="answer">Tela "Ledger não encontrado. Criar novo?" com CTA pro onboarding.</div>
+      </details>
+
+      <details>
+        <summary>Mês sem renda de nenhum dos dois (fresh ledger)</summary>
+        <div class="answer">Banner "configure sua renda do mês". Despesas usam 50/50 default; recalcula quando renda é digitada.</div>
+      </details>
+
+      <details>
+        <summary>Só um membro tem renda do mês corrente</summary>
+        <div class="answer">Fallback: o membro faltante usa sua própria renda mais recente de qualquer mês anterior. Se nunca houve, full-fallback no último mês com ambos. Se nunca houve nenhuma, 50/50.</div>
+      </details>
+
+      <details>
+        <summary>Edição de renda passada</summary>
+        <div class="answer">Recomputa balance de toda despesa daquele <code>monthKey</code>. Sem confirmação extra — é o efeito desejado.</div>
+      </details>
+
+      <details>
+        <summary>Transferência que cruza o sinal do saldo</summary>
+        <div class="answer">Permitida. Saldo passa pro outro lado; UI mostra "Diego deve agora R$ X" naturalmente.</div>
+      </details>
+
+      <details>
+        <summary>Dois clientes editam ao mesmo tempo</summary>
+        <div class="answer">Last-write-wins por entidade. Toast no client remoto avisando da mudança. UUIDs gerados no client evitam colisão de criação.</div>
+      </details>
+
+      <details>
+        <summary>Recurrence dia 31 em fevereiro</summary>
+        <div class="answer">Clamp pro último dia do mês curto.</div>
+      </details>
+
+      <details>
+        <summary>Despesa materializada por recorrência foi deletada</summary>
+        <div class="answer">Soft-delete (<code>deletedAt</code>). Unique constraint impede re-materialização naquele mês. Ela fica deletada de propósito.</div>
+      </details>
+
+      <details>
+        <summary>Slug vazado</summary>
+        <div class="answer">Sem mitigação técnica no MVP. Onboarding avisa do risco. Slug rotation é candidato pra v2.</div>
+      </details>
+
+      <details>
+        <summary>Cache do browser foi limpo</summary>
+        <div class="answer">Sem perda. Estado vive no servidor. Único risco real é perder o slug — daí o JSON export como escapatória.</div>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- 07 VERIFICATION -->
+  <section>
+    <h2><span class="num">07</span> Verification</h2>
+    <p>Cada componente é uma <em>VerifiableUnit</em> alinhada à arquitetura da Phase 3: schema Zod + fixtures + invariantes + DOM contract via <code>data-verify-*</code>. Probes (⚠) são fixtures adversariais.</p>
+
+    <div class="units">
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">BalanceHeader</span>
+          <span class="unit-tagline">saldo + proporção do mês selecionado</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">equal-incomes-zero-balance</span>
+          <span class="chip">a-paid-more-owes-less</span>
+          <span class="chip">fallback-from-prev-month</span>
+          <span class="chip probe">fallback-default-5050</span>
+          <span class="chip probe">large-balance-r1m</span>
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">IncomeCard</span>
+          <span class="unit-tagline">renda do membro no mês, edição inline</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">idle-with-amount</span>
+          <span class="chip">editing</span>
+          <span class="chip">saving-then-success</span>
+          <span class="chip probe">network-error</span>
+          <span class="chip">inherited-from-prev-month</span>
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">MonthTimeline</span>
+          <span class="unit-tagline">lista cronológica de expense + transfer</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">empty-month</span>
+          <span class="chip">mixed-expenses-transfers</span>
+          <span class="chip">recurrence-only-month</span>
+          <span class="chip probe">single-day-with-50-entries</span>
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">EntryRow</span>
+          <span class="unit-tagline">polimórfico (expense | transfer)</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">expense-paid-by-a</span>
+          <span class="chip">expense-paid-by-b</span>
+          <span class="chip">transfer-a-to-b</span>
+          <span class="chip">recurrence-instance</span>
+          <span class="chip">editing</span>
+          <span class="chip probe">negative-amount-rejected</span>
+          <span class="chip probe">zero-amount-rejected</span>
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">MonthBreakdown</span>
+          <span class="unit-tagline">totais e insight delta-vs-mês-anterior</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">prev-month-larger</span>
+          <span class="chip">prev-month-smaller</span>
+          <span class="chip">no-prev-month</span>
+          <span class="chip">current-month-empty</span>
+        </div>
+      </div>
+
+      <div class="unit">
+        <div class="unit-head">
+          <span class="unit-name">RecurrenceManager</span>
+          <span class="unit-tagline">tela de configurações</span>
+        </div>
+        <div class="fixtures">
+          <span class="chip">no-rules</span>
+          <span class="chip">mix-active-paused</span>
+          <span class="chip probe">rule-with-day-31-in-feb</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="invariants">
+      <h3>Invariantes cross-unit</h3>
+      <ul>
+        <li><code>balance(A) + balance(B) === 0</code> em qualquer estado mountado.</li>
+        <li><code>Σ shareA(meses) === Σ paidA(meses) − balance(A)</code> · identidade contábil.</li>
+        <li>Após <code>addExpense(X, A)</code>, <code>balance</code> muda exatamente em <code>round(X × proportionB / 100)</code>.</li>
+        <li>Após <code>addTransfer(A→B, Y)</code>, <code>balance</code> muda exatamente em <code>+Y</code> na direção esperada.</li>
+      </ul>
+    </div>
+
+    <p>Verificadores reutilizados da Phase 3: <code>schema</code>, <code>invariants</code>, <code>dom-contract</code>, <code>a11y</code>. Verificador novo: <code>accounting-identity</code> — roda os invariantes cross-unit em fixtures compostas e captura regressões em qualquer refactor da computação de balance.</p>
+  </section>
+
+  <!-- 08 OUT OF SCOPE -->
+  <section>
+    <h2><span class="num">08</span> Fora do escopo / Riscos</h2>
+
+    <div class="scope">
+      <h3>Não está no MVP</h3>
+      <ul>
+        <li>Multi-currency.</li>
+        <li>Categorias / tagging.</li>
+        <li>Despesa pessoal.</li>
+        <li>Audit log de edições.</li>
+        <li>Override de proporção por despesa.</li>
+        <li>Pix QR / payment processor.</li>
+        <li>Slug rotation.</li>
+        <li>Notificações / lembretes.</li>
+        <li>Mais de dois membros.</li>
+        <li>Export pra qualquer coisa além de JSON.</li>
+      </ul>
+    </div>
+
+    <div style="margin-top:32px">
+      <div class="risk">
+        <div class="label">Risco · Slug é credencial única</div>
+        <p>Perda = perda de dados. Vazamento = acesso irrestrito. Mitigação única no MVP é o usuário lembrar de exportar JSON. Slug rotation vira urgente se o app sair do workshop.</p>
+      </div>
+      <div class="risk">
+        <div class="label">Risco · Last-write-wins</div>
+        <p>Pode perder edição de um parceiro em escrita simultânea. Aceitável pra dois usuários low-contention; revisar se uso real mostrar contenção.</p>
+      </div>
+      <div class="risk">
+        <div class="label">Risco · Materialização preguiçosa</div>
+        <p>Depende de alguém abrir o app no mês. Pra casal de uso ativo, ok. Pra app dormente, balance fica certo só após o próximo open.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Phase 1 · Exploration · 2026-05-07</span>
+    <span>SPEC.md · SPEC.html · how-we-claude-code</span>
+  </footer>
+
+</main>
+</body>
+</html>
