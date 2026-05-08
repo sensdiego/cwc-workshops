@@ -51,8 +51,8 @@ LEGACY_TOOLS = [
 # ──────────────────────────────────────────────────────────────────────────
 
 SKILLS: list[str] = [
-    # "notify-templates",
-    # "weekly-report",
+    "notify-templates",
+    "weekly-report",
     # "reorder-policy",
     # "supplier-selection",
     # "forecasting",
@@ -116,7 +116,7 @@ def build_config(skill_ids: dict[str, str]) -> dict:
     return {
         "name": agent_name_for("stockpilot-starter"),
         "model": MODEL,
-        "system": LEGACY_PROMPT + _legacy_tools_note(),  # ← swap LEGACY_PROMPT to SHORT_PROMPT (cycle 1)
+        "system": SHORT_PROMPT + _legacy_tools_note(),  # ← swap LEGACY_PROMPT to SHORT_PROMPT (cycle 1)
         "tools": tools,
         "skills": [
             {"type": "custom", "skill_id": skill_ids[n], "version": "latest"}
